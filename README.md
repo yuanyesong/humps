@@ -26,6 +26,12 @@ Arrays of objects are also converted
     var array = [{ attr_one: 'foo' }, { attr_one: 'bar' }]
     humps.camelizeKeys(array); // [{ attrOne: 'foo' }, { attrOne: 'bar' }]
 
+Special words are ignored when camelize
+
+    humps.camelize('user_id') // 'userID'
+    
+    ignoredWordsList = ['API', 'ASCII', 'CPU', 'CSS', 'DNS', 'EOF', 'GUID', 'HTML', 'HTTP', 'HTTPS', 'ID', 'IP', 'JSON', 'LHS', 'QPS', 'RAM', 'RHS', 'RPC', 'SLA', 'SMTP', 'SSH', 'TLS', 'TTL', 'UID', 'UI', 'UUID', 'URI', 'URL', 'UTF8', 'VM', 'XML', 'XSRF', 'XSS']
+
 It also accepts a callback which can modify the conversion behavior. For example to prevent conversion of keys containing only uppercase letters or numbers:
 
     humps.camelizeKeys(obj, function (key, convert) {
