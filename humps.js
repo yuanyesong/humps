@@ -51,12 +51,8 @@
     if (_isNumerical(string)) {
       return string;
     }
-    // prevent conversion of keys containing only uppercase letters or numbers
-    if (/^[A-Z0-9_]+$/.test(string)) {
-      return string;
-    }
     // 特殊词语全部大写
-    let words = string.split('_')
+    var words = string.split('_')
     if (words.length > 1) {
       return words
           .map((word, index) => {
@@ -80,10 +76,6 @@
   };
 
   var decamelize = function(string, options) {
-    // prevent conversion of keys containing only uppercase letters or numbers
-    if (/^[A-Z0-9_]+$/.test(string)) {
-      return string;
-    }
     return separateWords(string, options).toLowerCase();
   };
 
