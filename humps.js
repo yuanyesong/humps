@@ -35,6 +35,7 @@
     }
     return output;
   };
+  var commonInitialisms = ['API', 'ASCII', 'CPU', 'CSS', 'DNS', 'EOF', 'GUID', 'HTML', 'HTTP', 'HTTPS', 'ID', 'IP', 'JSON', 'LHS', 'QPS', 'RAM', 'RHS', 'RPC', 'SLA', 'SMTP', 'SSH', 'TLS', 'TTL', 'UID', 'UI', 'UUID', 'URI', 'URL', 'UTF8', 'VM', 'XML', 'XSRF', 'XSS']
 
   // String conversion methods
 
@@ -50,11 +51,26 @@
     if (_isNumerical(string)) {
       return string;
     }
-    string = string.replace(/[\-_\s]+(.)?/g, function(match, chr) {
-      return chr ? chr.toUpperCase() : '';
-    });
-    // Ensure 1st char is always lowercase
-    return string.substr(0, 1).toLowerCase() + string.substr(1);
+    // prevent conversion of keys containing only uppercase letters or numbers
+    if (/^[A-Z0-9_]+$/.test(string)) {
+      return string;
+    }
+    // 特殊词语全部大写
+    let words = string.split('_')
+    if (words.length > 1) {
+      return words
+          .map((word, index) => {
+            if (index === 0) {
+              return word.toLowerCase();
+            }
+            if (commonInitialisms.indexOf(word.toUpperCase()) !== -1) {
+              return word.toUpperCase();
+            }
+            return word.substr(0, 1).toUpperCase() + word.substr(1);
+          })
+          .join('');
+    }
+    return string.toLowerCase();
   };
 
   var pascalize = function(string) {
@@ -64,6 +80,10 @@
   };
 
   var decamelize = function(string, options) {
+    // prevent conversion of keys containing only uppercase letters or numbers
+    if (/^[A-Z0-9_]+$/.test(string)) {
+      return string;
+    }
     return separateWords(string, options).toLowerCase();
   };
 
