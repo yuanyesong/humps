@@ -35,23 +35,106 @@
     }
     return output;
   };
-  var commonInitialisms = ['API', 'ASCII', 'CPU', 'CSS', 'DNS', 'EOF', 'GUID', 'HTML', 'HTTP', 'HTTPS', 'ID', 'IP', 'JSON', 'LHS', 'QPS', 'RAM', 'RHS', 'RPC', 'SLA', 'SMTP', 'SSH', 'TLS', 'TTL', 'UID', 'UI', 'UUID', 'URI', 'URL', 'UTF8', 'VM', 'XML', 'XSRF', 'XSS']
+  var commonInitialisms = ['API', 'ASCII', 'CPU', 'CSS', 'DNS', 'EOF', 'GUID', 'HTML', 'HTTP', 'HTTPS', 'ID', 'IP', 'JSON', 'LHS', 'QPS', 'RAM', 'RHS', 'RPC', 'SLA', 'SMTP', 'SSH', 'TLS', 'TTL', 'UID', 'UI', 'UUID', 'URI', 'URL', 'UTF8', 'VM', 'XML', 'XSRF', 'XSS'];
 
   // String conversion methods
 
   var separateWords = function(string, options) {
     options = options || {};
     var separator = options.separator || '_';
-    var split = options.split || /(?=[A-Z])/;
-
-    return string.split(split).join(separator);
+    var words = [];
+    var firstSegment = split(string);
+    for(var i = 0,len = firstSegment.length; i < len; i++){
+      if (/[A-Z0-9]/.test(firstSegment[i])) {
+        var secondSegment = segment(firstSegment[i], commonInitialisms, getWindowSize(commonInitialisms));
+        words.push(secondSegment);
+      } else {
+        words.push(firstSegment[i]);
+      }
+    }
+    return words.join(separator);
   };
+
+  function getWindowSize(wordsDict) {
+    var maxWordLen = 0;
+    wordsDict.forEach(function (word, index) {
+      if (word.length > maxWordLen)
+        maxWordLen = word.length;
+    });
+    return maxWordLen;
+  }
+
+  // segment all upper case words which join by word in commonInitialisms, like 'CPUUUID' to ['CPU', 'UUID']
+  // using Maximum Matching algorithm, based on https://blog.csdn.net/Elenore1997/article/details/83274720
+  function segment(sentence, wordsDict, windowSize) {
+    var sentenceLen = sentence.length;
+    var index = 0;
+    var result = [];
+    while (index <= sentenceLen){
+      var match =false;
+      for (var i = windowSize; i > 0; i--) {
+        var subStr = sentence.substring(index,index+i);
+        if (wordsDict.indexOf(subStr) !== -1) {
+          match = true;
+          result.push(subStr);
+          index += i;
+          break;
+        }
+      }
+      if (!match) {
+        result.push(sentence[index]);
+        index += 1;
+      }
+    }
+    return result;
+  }
+
+  // smart split camelCase string, like 'userIDName' to ['user', 'ID', 'Name']
+  function split(string) {
+    var upperCaseBreakPoint = false;
+    var lowerCaseChr = [];
+    var upperCaseChr = [];
+    var segment = [];
+    for (i = 0; i < string.length; i++) {
+      var chr = string.charAt(i);
+      // lower case character or number
+      if (/[a-z0-9]/.test(chr)) {
+        if (upperCaseBreakPoint) {
+          if (upperCaseChr.length > 0 ) {
+            var temp = upperCaseChr.slice(0, upperCaseChr.length-1);
+            if (temp.length > 0 ) {
+              segment.push(temp.join(''));
+            }
+            lowerCaseChr.push(upperCaseChr.slice(-1));
+            upperCaseChr = [];
+          }
+        }
+        upperCaseBreakPoint = false;
+        lowerCaseChr.push(chr);
+      } else {
+        // upper case character or number
+        upperCaseBreakPoint =true;
+        if (lowerCaseChr.length > 0 ) {
+          segment.push(lowerCaseChr.join(''));
+          lowerCaseChr = [];
+        }
+        upperCaseChr.push(chr);
+      }
+    }
+    if (upperCaseChr.length > 0) {
+      segment.push(upperCaseChr.join(''));
+    }
+    if (lowerCaseChr.length > 0) {
+      segment.push(lowerCaseChr.join(''));
+    }
+    return segment;
+  }
 
   var camelize = function(string) {
     if (_isNumerical(string)) {
       return string;
     }
-    // 特殊词语全部大写
+    // not to camel words in commonInitialisms, like user_id to userID
     var words = string.split('_')
     if (words.length > 1) {
       return words
@@ -77,6 +160,8 @@
 
   var decamelize = function(string, options) {
     return separateWords(string, options).toLowerCase();
+    // var patten = /([a-z0-9]+)([A-Z0-9]*)?([A-Z][a-z0-9]+)|([a-z0-9]+)([A-Z0-9]*)?/
+    // var group = string.match(patten)
   };
 
   // Utilities

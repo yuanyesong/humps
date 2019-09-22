@@ -26,9 +26,10 @@ Arrays of objects are also converted
     var array = [{ attr_one: 'foo' }, { attr_one: 'bar' }]
     humps.camelizeKeys(array); // [{ attrOne: 'foo' }, { attrOne: 'bar' }]
 
-Special words are ignored when camelize
+Special words are ignored when camelize and decamelize
 
     humps.camelize('user_id') // 'userID'
+    humps.decamelize('userID') // 'user_id'
     
     ignoredWordsList = ['API', 'ASCII', 'CPU', 'CSS', 'DNS', 'EOF', 'GUID', 'HTML', 'HTTP', 'HTTPS', 'ID', 'IP', 'JSON', 'LHS', 'QPS', 'RAM', 'RHS', 'RPC', 'SLA', 'SMTP', 'SSH', 'TLS', 'TTL', 'UID', 'UI', 'UUID', 'URI', 'URL', 'UTF8', 'VM', 'XML', 'XSRF', 'XSS']
 
