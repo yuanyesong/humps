@@ -43,7 +43,14 @@
     options = options || {};
     var separator = options.separator || '_';
     var words = [];
-    var firstSegment = split(string);
+    var firstSegment = '';
+    // if string is snake_case string, split string by '_'
+    if (string.indexOf(separator) != -1) {
+      firstSegment = string.split(separator)
+    } else {
+      // else string is camenCase string
+      firstSegment = split(string)
+    }
     for(var i = 0,len = firstSegment.length; i < len; i++){
       if (/[A-Z0-9]+$/.test(firstSegment[i])) {
         var secondSegment = segment(firstSegment[i], commonInitialisms, getWindowSize(commonInitialisms));
