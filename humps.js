@@ -45,7 +45,7 @@
     var words = [];
     var firstSegment = split(string);
     for(var i = 0,len = firstSegment.length; i < len; i++){
-      if (/[A-Z0-9]/.test(firstSegment[i])) {
+      if (/[A-Z0-9]+$/.test(firstSegment[i])) {
         var secondSegment = segment(firstSegment[i], commonInitialisms, getWindowSize(commonInitialisms));
         words.push(secondSegment);
       } else {
